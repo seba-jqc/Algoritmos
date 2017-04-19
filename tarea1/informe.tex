@@ -1,0 +1,349 @@
+% Template:     Informe/Reporte LaTeX
+% Documento:    Archivo principal
+% Versión:      3.0.0 (01/04/2017)
+% Codificación: UTF-8
+%
+% Autor: Pablo Pizarro R.
+%        Facultad de Ciencias Físicas y Matemáticas.
+%        Universidad de Chile.
+%        pablo.pizarro@ing.uchile.cl, ppizarror.com
+%
+% Sitio web del proyecto: [http://ppizarror.com/Template-Informe/]
+% Licencia: MIT           [https://opensource.org/licenses/MIT]
+
+% CREACIÓN DEL DOCUMENTO, FUENTE E IDIOMA
+\documentclass[letterpaper,11pt]{article} % Articulo tamaño carta, fuente 11
+\usepackage[utf8]{inputenc}               % Codificación UTF-8
+\usepackage[T1]{fontenc}                  % Soporta caracteres acentuados
+\usepackage{lmodern}                      % Tipografía moderna
+\usepackage[spanish]{babel}               % Idioma del documento en español
+\def\templateversion{3.0.0}               % Versión del template
+               
+% INFORMACIÓN DEL DOCUMENTO
+\newcommand{\nombredelinforme}{Tarea 1}
+\newcommand{\temaatratar}{Pilas de Arena}
+\newcommand{\fecharealizacion}{\today}
+\newcommand{\fechaentrega}{\today}
+
+\newcommand{\autordeldocumento}{Sebastián Jorquera}
+\newcommand{\nombredelcurso}{Algoritmos y Estructuras de Datos}
+\newcommand{\codigodelcurso}{CC-3001-2}
+
+\newcommand{\nombreuniversidad}{Universidad de Chile}
+\newcommand{\nombrefacultad}{Facultad de Ciencias Físicas y Matemáticas}
+\newcommand{\departamentouniversidad}{Departamento de la Universidad}
+\newcommand{\imagendeldepartamento}{images/departamentos/fcfm}
+\newcommand{\imagendeldepartamentoescl}{0.2}
+\newcommand{\localizacionuniversidad}{Santiago, Chile}
+
+% INTEGRANTES, PROFESORES Y FECHAS
+\newcommand{\tablaintegrantes}{
+\begin{minipage}{1.0\textwidth}
+\begin{flushright}
+\begin{tabular}{ll}
+	Nombre:
+		& \begin{tabular}[t]{@{}l@{}}
+			Sebastián Jorquera \\
+		\end{tabular} \\
+	Profesor:
+		& \begin{tabular}[t]{@{}l@{}}
+			Nelson Baloian \\
+		\end{tabular} \\
+	Auxiliares:
+		& \begin{tabular}[t]{@{}l@{}}
+			Sergio Peñafiel \\
+			Gabriel Azocar
+		\end{tabular}\\
+	Ayudantes:
+		& \begin{tabular}[t]{@{}l@{}}
+			Cristóbal Muñoz \\
+			Fabian González \\
+			Gabriel Chandia
+		\end{tabular}\\
+	\multicolumn{2}{l}{Fecha de realización: \fecharealizacion} \\
+	\multicolumn{2}{l}{Fecha de entrega: \fechaentrega} \\
+	\multicolumn{2}{l}{\localizacionuniversidad}
+\end{tabular}
+\end{flushright}
+\end{minipage}}
+
+% CONFIGURACIONES
+\input{lib/config}
+
+% IMPORTACIÓN DE LIBRERÍAS
+\input{lib/imports}
+
+% IMPORTACIÓN DE FUNCIONES
+\input{lib/functions}
+
+% IMPORTACIÓN DE AMBIENTES Y ESTILOS
+\input{lib/styles}
+
+% CONFIGURACIÓN INICIAL DEL DOCUMENTO
+\input{lib/initconf}
+	
+% PORTADA
+\begin{document}
+\input{lib/portrait}
+
+% CONFIGURACIÓN DE PÁGINA Y ENCABEZADOS
+\input{lib/pageconf}
+
+% CONFIGURACIONES FINALES - INICIO DE LAS SECCIONES
+\input{lib/finalconf}
+
+% ======================== INICIO DEL DOCUMENTO ========================
+\section{Introducción}
+El fin último de estudiar diversos problemas físicos es encontrar un modelo analítico que permita describir el comportamiento de estos. Sin embargo muchas veces estos modelos son tan complejos que se vuelven casi imposibles de resolver mediante métodos de cálculo tradicionales; y es allí donde la modelación computacional ha aparecido como una alternativa para la resolución de estos problemas. 
+\newp
+En nuestro caso, el problema a estudiar corresponde al comportamiento de los granos de arena apilados en un espacio, a los cuales se les aplica una regla de estabilidad por gravedad. En particular, el interés esta en observar el estado de evolución final de esta pila de granos arena.
+\newp
+El comportamiento de la pila de arena es relativamente simple. La superficie donde se ubican los granos de arena se separará en celdas cuadradas idénticas, formando una estructura con la siguiente forma:
+\insertimage{cuadrilla}{scale=0.4}{modelo de superficie}
+De esta forma, los granos de arena se encontrarán apilados dentro de estas celdas. La regla de estabilidad consiste en que si el número de granos dentro de una celda es mayor o igual a 4, la pila debe desbordarse y dejar un grano en cada celda adyacente.
+\newp
+Para representar la evolución de la pila de arena, se creará una matriz de un tamaño los suficientemente grande como para almacenar la configuración final de los granos de arena, con el total de granos de arena en la celda central en un inicio. Esta matriz será recorrida un número de veces tal que en cada pasada se aplique la regla de estabilidad a las cuadrillas con arena hasta llegar al punto en que no hayan más celdas inestables, momento en el cual se mostrará la distribución final de los granos de arena.
+
+\newpage
+
+\section{Análisis del problema}
+El problema a resolver es el siguiente; el usuario debe declarar un número N de granos de arena, que corresponde a la cantidad de granos que se ubicarán inicialmente en el centro. Luego de esto, se aplicará la siguiente regla de estabilidad mencionada en la sección anterior: si $n\geq4$, con n el número de granos en una celda, entonces esta celda se desbordará, depositando un grano de arena en cada una de las celdas adyacentes. El comportamiento se muestra en la siguiente imagen.
+\insertdoubleimage[\label{img-double-1}]{cuadrilla2}{scale=0.4}{estado inicial de las cuadrillas}{cuadrilla3}{scale=0.4}{estado posterior al desborde}{Evolución de la pila de arena}
+
+\subsection{Supuestos}
+El programa implementado para resolver el problema funciona bajo los siguientes supuestos.
+\begin{itemize}
+\item El número ingresado por el usuario siempre corresponde a un int
+\item La matriz en la que se distribuye la arena es lo suficientemente grande para almacenar la distribución final de los granos de arena.
+\item Dado el supuesto anterior, toda celda con arena tiene una celda adyacente arriba, abajo, a su izquierda y a su derecha (no existen sumideros).
+\item El orden en que se desbordan las celdas no tiene efecto en la configuración final.
+\end{itemize}
+\subsection{Metodología}
+A continuación se muestran los pasos a seguir por el algoritmo para determinar la distribución final de los granos de arena.
+\begin{enumerate}
+\item Se le solicita al usuario un número inicial de granos de arena
+\item Se crea una matriz que contiene solamente 0 lo suficientemente grande para almacenar la distribución final de arena (Como hacer esto se detallará en la siguiente sección)
+\item Se cambia el valor de la celda central de la matriz por el número de granos de arena.
+\item Se recorre la matriz, aplicando a cada celda la regla de estabilidad.
+\item Se cuenta el número de desbordes o avalanchas ocurridas en un paso por la matriz.
+\item Si el número de avalanchas es mayor a 0, se repiten los paso 4 y 5 hasta lograr recorrer la matriz sin que ocurran avalanchas.
+\item se muestra la distribución final.
+\end{enumerate}
+
+\subsection{Casos de borde}
+\begin{itemize}
+    \item Si el número ingresado por el usuario no corresponde a un int, el programa no se ejecutará.
+\end{itemize}
+
+\newpage
+
+\section{Solución del problema}
+La resolución del problema consta de dos pasos fundamentales:
+\begin{enumerate}
+\item Crear una matriz lo suficientemente grande para contener la distribución final de los granos de arena.
+\item Ubicar el total de granos en el centro y recorrer la matriz, aplicando el criterio de estabilidad, hasta llegar a la configuración o distribución final.
+\end{enumerate}
+A continuación se presentará la solución de cada uno de estos problemas por separado, y luego se mostrará la solución final.
+\subsection{Creación de la matriz}
+La idea es encontrar una cota superior para el tamaño de la matriz, y así poder almacenar toda la arena en su interior (evitar sumideros). Cuando se utiliza un número bajo de granos de arena (por ejemplo 25) la distribución final de los granos de arena en la matriz tiene la siguiente forma:
+\begin{figure}[h!]
+\centering
+$
+\begin{bmatrix}
+0&0&x&0&0 \\
+0&x&x&x&0 \\
+x&x&x&x&x \\
+0&x&x&x&0 \\
+0&0&x&0&0
+\end{bmatrix}
+$
+\caption{ejemplo de distribución de arena}
+\end{figure}
+En esta figura, las celdas marcadas con una $x$ corresponden a celdas con arena. De esta representación es posible extraer ciertas conclusiones, las cuales son:
+\begin{itemize}
+    \item La forma de diamante es la estructura básica o 'esqueleto' de las distribuciones.
+     \item la fila y la columna central son las que poseen el mayor número de celdas con arena.
+\end{itemize}
+Dado esto se puede ver que basta determinar una cota superior para la cantidad de celdas con arena en la columna o fila central (dado que el problema es simétrico, ambas tienen el mismo tamaño). Asumiendo que la distribución tiene forma de diamante, su "área" puede calcularse como:
+\insertequation{Area=\frac{d^2}{2}}
+donde d corresponde al largo de la diagonal, y en este caso el área corresponde al número de celdas contenidas. Si además se asume que cada celda contiene solamente un grano de arena, se tiene que el área del diamante es igual al total de granos de arena, al cual denotaremos por N. Reemplazando en la ecuación (3.1) se tiene que:
+\insertequation{N=\frac{d^2}{2}}
+y despejando d se llega a:
+\insertequation{d=\sqrt{2*N}}
+Como d es la diagonal, basta con aproximarla al entero mayor más cercano (pues el resultado casi nunca es entero). De esta forma se determina que basta con una matriz de tamaño [d]X[d] para contener la arena. Así, se define un algoritmo que permite crear una matriz del tamaño deseado, dado una cantidad N de granos:
+\lstset{style=Java}
+\begin{lstlisting}[language=Java, caption=Algoritmo generador de matrices]
+   public static int[][] matrix_generator(int N){
+        double size = Math.ceil(Math.sqrt(N));
+        if(size%2!=0) {
+            int[][] matriz = new int[(int)size][(int)size];
+            return matriz;
+        }
+        else{
+            size+=1;
+            int[][] matriz = new int[(int)size][(int)size];
+            return matriz;
+        }
+    }
+\end{lstlisting}
+\newp
+El algoritmo sigue la idea descrita anteriormente para determinar el tamaño de la matriz, con unas pequeñas modificaciones. En primer lugar, luego de probar una versión inicial del programa, se pudo ver que bastaba con calcular solamente $\sqrt{N}$ en lugar de $\sqrt{2N}$.Por último, si el valor del tamaño es un número par, se aumenta en uno para obtener un valor impar; esto para siempre tener una celda central bien definida.
+
+\subsection{Aplicar criterio de estabilidad}
+Una vez creada la matriz, es necesario ubicar la matriz y aplicar el criterio de estabilidad hasta llegar a la distribución final. Para esto se implementa el siguiente algoritmo:
+\lstset{style=Java}
+\begin{lstlisting}[language=Java, caption=Algoritmo repasador de matriz]
+    public static int avalanche_matrix(int[][] matriz) {
+        int avalanchas = 0;
+        for (int i = 0; i < matriz.length; i++) {
+            for (int j = 0; j < matriz.length; j++) {
+                if (matriz[i][j] >= 4) {
+                    matriz[i + 1][j] += 1;
+                    matriz[i - 1][j] += 1;
+                    matriz[i][j + 1] += 1;
+                    matriz[i][j - 1] += 1;
+                    matriz[i][j] -= 4;
+                    avalanchas += 1;
+                }
+            }
+        }
+        return avalanchas;
+    }
+\end{lstlisting}   
+\newp
+El algoritmo recorre toda la matriz, y al encontrar una celda que no cumpla el criterio de estabilidad descrito anteriormente, genera un desborde y depositan un grano de arena en cada celda adyacente. Además, se cuenta el número de avalanchas totales y se retorna este valor.
+\newp
+El algoritmo \textit{avalanche\_matrix} solamente recorre la matriz una vez. Para poder aplicarlo la cantidad de veces necesaria, se aplica la siguiente instrucción.
+\lstset{style=Java}
+\begin{lstlisting}[language=Java, caption=Loop del recorrido de la matriz]
+    public static void main(String[] args){
+        //...
+        while(true){
+            int av = avalanche_matrix(matriz);
+            if(av==0){
+                break;
+            }
+        }
+        //...
+    }
+\end{lstlisting}
+Este loop permite ejecutar \textit{avalanche\_matrix} hasta llegar a la configuración de la matriz donde ya no se tienen más avalanchas.
+\newp
+Finalmente, el módulo PilaArena tiene la siguiente forma.
+\lstset{style=Java}
+\begin{lstlisting}[language=Java, caption=Loop del recorrido de la matriz]
+    public static void main(String[] args){
+        Scanner granos = new Scanner(System.in);
+        System.out.println("Numero de granos (N)?");
+        int N = granos.nextInt();
+        int[][] matriz = matrix_generator(N);
+        int centro = (int) Math.floor(matriz.length/2);
+        matriz[centro][centro] = N;
+        while(true){
+            int av = avalanche_matrix(matriz);
+            if(av==0){
+                break;
+            }
+        }
+        Ventana v = new Ventana(800, "resultado");
+        v.mostrarMatriz(matriz);
+    }
+\end{lstlisting}
+
+\subsection{Modo de uso}
+Todos los métodos necesario para resolver el problema están contenidos en el archivo \textit{PilaArena.java}. Una vez compilado, basta con llamar a PilaArena.
+\newp
+Los métodos necesarios para mostrar las imágenes se encuentran en el archivo \textit{Ventana.java}, el cual se entrego al inicio de la tarea. 
+
+\section{Resultados y Análisis}
+El programa se ejecutó cinco veces, con 25, 100, 1000, 10000, 100000 granos de arena respectivamente. Se presentan las configuraciones finales obtenidas.
+
+\insertpentaimage[\label{img-penta-1}]{25granos.jpg}{100granos.jpg}{1000granos.jpg}{10000granos.jpg}{100000granos.jpg}{scale=0.21}{Distribución final con 25, 100, 1000, 10000, 100000 granos de arena}
+
+\subsection{Análisis de Resultados}
+Si bien no se tenía conocimiento previo de como debían ser las distribuciones finales para las cantidades de granos de arena utilizados, hay indicadores que permiten concluir que estas están bien construidas. En primer lugar se observa que las imágenes son simétricas, lo que es acorde a la forma de evolución de la pila de arena. Además en ningún caso se obtuvo un error con respecto al número de granos en las celdas (ninguna celda tiene un valor mayor a 4)
+
+\subsection{Análisis de Algoritmos}
+Dentro de los métodos implementados, existen 2 que merecen ser analizados con más detalle. Estos son el método \textit{avalanche\_matrix} y el loop booleano en dentro del \textit{main}. 
+\newp
+Ambos elementos están sumamente relacionados, puesto que como se dijo antes el loop booleano es el que permite ejecutar el método \textit{avalanche\_matrix} la cantidad necesaria de veces para obtener el resultado final. Implementar un loop booleano conlleva el riesgo de que el programa quede atrápado en un ciclo de repeticiones infinito. Este loop podría evitarse si el método \textit{avalanche\_matrix} se hiciera recursivo; de hecho este fue implementado de esa manera en un principio. El problema es que al ser recursivo, existía un valor límite para los granos de arena; al sobrepasar este número, se producía un \textit{StackOverflow}, y el programa no se ejecutaba. Dado esto se optó por el loop booleano, pero no se descarta la posibilidad de encontrar un método recursivo para obtener los resultados solicitados.
+
+\newpage
+
+\section{Anexos}
+Se muestra el programa completo utilizado para modelar las pilas de arena.
+\lstset{style=Java}
+\begin{lstlisting}[language=Java, caption=Loop del recorrido de la matriz]
+import java.util.Scanner;
+
+/**
+ * Created by sebastian on 07-04-17.
+ */
+public class PilaArena {
+
+    public static int[][] matrix_generator(int N){
+        // se calcula la cota superior para el tamaño de la fila central
+        double size = Math.ceil(Math.sqrt(N));
+        if(size%2!=0) {
+            // si el valor es impar, se deja como el tamaño de la matriz
+            int[][] matriz = new int[(int)size][(int)size];
+            return matriz;
+        }
+        else{
+            // si el valor es par, se le suma 1 para hacerlo impar y se crea la matriz
+            size+=1;
+            int[][] matriz = new int[(int)size][(int)size];
+            return matriz;
+        }
+    }
+
+
+
+    public static int avalanche_matrix(int[][] matriz) {
+        // se inicializa un contador para las avlanchas
+        int avalanchas = 0;
+        for (int i = 0; i < matriz.length; i++) {
+            // se recorren todas las filas de la matriz
+            for (int j = 0; j < matriz.length; j++) {
+                // se recorren todas las celdas de la fila
+                if (matriz[i][j] >= 4) {
+                    // se aplica el criterio de estabilidad y se suma 1 al numero de avalanchas
+                    matriz[i + 1][j] += 1;
+                    matriz[i - 1][j] += 1;
+                    matriz[i][j + 1] += 1;
+                    matriz[i][j - 1] += 1;
+                    matriz[i][j] -= 4;
+                    avalanchas += 1;
+                }
+            }
+        }
+        // se devuelve el numero de avalanchas
+        return avalanchas;
+    }
+
+    public static void main(String[] args){
+        Scanner granos = new Scanner(System.in);
+        // se solicita el numero de granos al ususario
+        System.out.println("Numero de granos (N)?");
+        int N = granos.nextInt();
+        // se genera la matriz con el tamano necesario
+        int[][] matriz = matrix_generator(N);
+        // se depositan los granos de arena en el centro
+        int centro = (int) Math.floor(matriz.length/2);
+        matriz[centro][centro] = N;
+        // se recorre la matriz hasta que ya no se produzcan mas avalanchas
+        while(true){
+            int av = avalanche_matrix(matriz);
+            if(av==0){
+                break;
+            }
+        }
+        // finalmente, se muestra la distribucion final de los granos de arena 
+        Ventana v = new Ventana(800, "resultado");
+        v.mostrarMatriz(matriz);
+    }
+}
+
+\end{lstlisting}
+% FIN DEL DOCUMENTO
+\end{document}

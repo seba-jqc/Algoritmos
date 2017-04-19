@@ -21,10 +21,10 @@ public class Main {
             int[][] alemania = {
                     {3,3,3},
                     {2,2,2},
-                    {0,0,0}
+                    {1,1,1}
             };
             Ventana v = new Ventana(500,"Matriz de ejemplo");
-            v.mostrarMatriz(mat);
+            v.mostrarMatriz(alemania);
 
         }
 
